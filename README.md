@@ -50,6 +50,9 @@ Key Consideration: Addressed class imbalance during modeling; proceeded with thr
 The dataset is then split into a training set, a validation set, testing set.
 ## Modelling
 Two major models were evaluated for sentiment classification: Logistic Regression (baseline) and Random Forest.
+
+**The dataset used for the results in modelling is the validation set, not the testing set as it is used in the evaluation step.**
+
 ### 1. Logistic Regression
 The baseline Logistic Regression model achieved an overall accuracy of 63.4%. It performed well on neutral tweets (precision = 0.65, recall = 0.79) but struggled with negative sentiment detection (recall = 0.09). The model showed moderate performance for positive tweets (f1 = 0.55). Overall, it indicated a bias toward neutral sentiment, revealing the need for better class balance handling.
 
@@ -57,4 +60,64 @@ The baseline Logistic Regression model achieved an overall accuracy of 63.4%. It
 
 ![Analysis 5](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(113).png)
 
-## 2. 
+### 2. Initial Comparison (No Tuning):
+Logistic Regression outperformed Random Forest overall.
+Accuracy: 0.634 vs 0.608
+
+Negative recall was very low for both (0.09 vs 0.078), indicating that rare negative complaints were poorly captured.
+F1-scores showed Logistic Regression performed better on Positive and Negative classes, while Random Forest slightly better on Neutral.
+
+<p align = 'center'> Logistic Regression Vs Random Forest</p>
+
+![Analysis 6](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(114).png)
+
+### 3. Logistic Regression with Class Balancing:
+Balancing class weights significantly improved the model’s ability to detect negative tweets.
+
+Negative recall jumped from 0.09 to 0.50 (+0.41), while overall accuracy slightly decreased (0.634 to 0.582).
+This trade-off was favorable since detecting negative feedback was the primary objective. 
+.
+<p align = 'center'> Logistic Regression with classes balanced</p>
+
+![Analysis 7](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(115).png)
+
+### 4. SMOTE with Logistic Regression:
+Using SMOTE to generate synthetic negative examples further improved Negative F1 (0.340 to 0.360) and Precision (0.260 to 0.290) with minimal impact on accuracy (0.582 to 0.590).
+
+Negative recall remained high (0.484), close to the auto-balanced model.
+
+<p align = 'center'>SMOTE with Logistic Regression</p>
+
+![Analysis 8](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(118).png)
+
+### 5. Logistic Regression Model Comparison
+We evaluated three Logistic Regression variants for detecting negative tweets. The original model (no weighting) had the highest overall accuracy (0.634) but very low negative recall (0.094), missing most complaints. Applying class weights (Auto-Balanced) dramatically improved negative recall to 0.500, though precision dropped, resulting in more false positives. Using SMOTE to generate synthetic negative examples slightly reduced recall (0.484) but increased precision (0.287) and achieved the highest Negative F1 (0.360), providing the best balance between detecting complaints and minimizing false alerts. Overall, SMOTE Logistic Regression was the most effective model for actionable complaint detection.
+
+<p align = 'center'>Final Comparison Between the Logistic models</p>
+
+![Analysis 9](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(119).png)
+
+## Evaluation
+The testing set is used here. 
+
+The SMOTE Logistic Regression model, identified as the best-performing model, was evaluated on the test set and achieved an overall accuracy of 61.7%. Performance on individual sentiment classes demonstrates its effectiveness in capturing customer feedback:
+- Negative Tweets: Recall 50.0%, Precision 32.1%, F1-Score 39.1% (86 tweets)
+- Neutral Tweets: Recall 64.0%, Precision 70.0%, F1-Score 67.0% (611 tweets)
+- Positive Tweets: Recall 60.0%, Precision 60.0%, F1-Score 60.0% (430 tweets)
+
+Compared to the validation set, the test set results show slight improvements across all key metrics, with accuracy increasing from 59.1% to 61.7%, negative recall from 48.4% to 50.0%, negative precision from 28.7% to 32.1%, and negative F1 from 36.0% to 39.1%.
+
+These results indicate that the model generalizes well to unseen data. It is particularly effective at detecting negative tweets, which is the primary business objective, while maintaining balanced performance for neutral and positive sentiments. Overall, the model provides a reliable automated solution for monitoring customer complaints and delivering actionable insights for product management.
+
+<p align = 'center'>Evaluation Uisng the testing set</p>
+
+![Analysis 10](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(116).png)
+
+## Conclusion
+We developed and validated a production-ready sentiment analysis system that automatically detects customer complaints for Apple. The SMOTE Logistic Regression model achieves 50% negative tweet detection, generalizes well to unseen data, and balances recall with overall performance. By handling class imbalance effectively, it transforms Twitter data into actionable insights, giving the product team real-time visibility into customer sentiment and emerging issues.
+
+## Recommendations
+- Deploy SMOTE Logistic Regression to cloud environment
+- Set up real-time Twitter API integration
+- Create basic alerting system for product team
+- Establish model performance monitoring
