@@ -35,7 +35,7 @@ Among others.
 ## Data Preparation
 - Cleaning & Processing: Removed duplicates, empty, and very short tweets; standardized sentiment labels to Positive, Negative, and Neutral.
 
-<p align = 'center'>Sentiment Distribution after Mapping></p>
+<p align = 'center'>Sentiment Distribution after Mapping</p>
 
   ![Analysis 1](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(112).png)
 - Dataset Creation: Built an Apple-focused subset of 5,633 tweets while retaining the original dataset.
@@ -60,7 +60,7 @@ The baseline Logistic Regression model achieved an overall accuracy of 63.4%. It
 
 ![Analysis 5](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(113).png)
 
-### 2. Initial Comparison (No Tuning):
+### 2. Initial Comparison (No Tuning)
 Logistic Regression outperformed Random Forest overall.
 Accuracy: 0.634 vs 0.608
 
@@ -71,7 +71,7 @@ F1-scores showed Logistic Regression performed better on Positive and Negative c
 
 ![Analysis 6](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(114).png)
 
-### 3. Logistic Regression with Class Balancing:
+### 3. Logistic Regression with Class Balancing
 Balancing class weights significantly improved the model’s ability to detect negative tweets.
 
 Negative recall jumped from 0.09 to 0.50 (+0.41), while overall accuracy slightly decreased (0.634 to 0.582).
@@ -81,7 +81,7 @@ This trade-off was favorable since detecting negative feedback was the primary o
 
 ![Analysis 7](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(115).png)
 
-### 4. SMOTE with Logistic Regression:
+### 4. SMOTE with Logistic Regression
 Using SMOTE to generate synthetic negative examples further improved Negative F1 (0.340 to 0.360) and Precision (0.260 to 0.290) with minimal impact on accuracy (0.582 to 0.590).
 
 Negative recall remained high (0.484), close to the auto-balanced model.
