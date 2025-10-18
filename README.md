@@ -31,5 +31,30 @@ Text Characteristics by sentiment
 Brand and sentiment Cross-Analysis
 ![Analysis 3](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(111).png)
 
-among others.
+Among others.
 ## Data Preparation
+- Cleaning & Processing: Removed duplicates, empty, and very short tweets; standardized sentiment labels to Positive, Negative, and Neutral.
+
+<p align = 'center'>Sentiment Distribution after Mapping></p>
+
+  ![Analysis 1](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(112).png)
+- Dataset Creation: Built an Apple-focused subset of 5,633 tweets while retaining the original dataset.
+- Text Preprocessing: Applied cleaning, tokenization, and lemmatization.
+- Dataset Overview: 5,633 tweets with 54% Neutral, 38% Positive, 8% Negative.
+
+<p align = 'center'> Cleaned tweet Analysis</p>
+
+![Analysis 3](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(120).png)
+Key Consideration: Addressed class imbalance during modeling; proceeded with three-class classification for nuanced sentiment insights.
+
+The dataset is then split into a training set, a validation set, testing set.
+## Modelling
+Two major models were evaluated for sentiment classification: Logistic Regression (baseline) and Random Forest.
+### 1. Logistic Regression
+The baseline Logistic Regression model achieved an overall accuracy of 63.4%. It performed well on neutral tweets (precision = 0.65, recall = 0.79) but struggled with negative sentiment detection (recall = 0.09). The model showed moderate performance for positive tweets (f1 = 0.55). Overall, it indicated a bias toward neutral sentiment, revealing the need for better class balance handling.
+
+<p align = 'center'> Logistic Regression(Baseline model)</p>
+
+![Analysis 5](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(113).png)
+
+## 2. 
