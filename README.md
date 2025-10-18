@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Twitter Sentiment Analysis
 ## Business Understanding
 **Stakeholder & Problem Statement**: Sarah Chen, Senior Product Manager for iOS at Apple Inc., faces challenges in keeping up with the vast amount of customer feedback on Twitter. With thousands of daily mentions, manually analyzing sentiment is slow, inconsistent, and difficult to scale. This leads to delayed responses to product issues and missed complaints, ultimately affecting customer satisfaction and the quality of Apple products.
