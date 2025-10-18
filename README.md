@@ -109,7 +109,7 @@ Compared to the validation set, the test set results show slight improvements ac
 
 These results indicate that the model generalizes well to unseen data. It is particularly effective at detecting negative tweets, which is the primary business objective, while maintaining balanced performance for neutral and positive sentiments. Overall, the model provides a reliable automated solution for monitoring customer complaints and delivering actionable insights for product management.
 
-<p align = 'center'>Evaluation Uisng the testing set</p>
+<p align = 'center'>Evaluation Using the testing set</p>
 
 ![Analysis 10](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(116).png)
 
