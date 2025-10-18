@@ -15,7 +15,9 @@ Some more info on this dataset:
 - Has no placeholders.
 
 Some analysis was also done:
+![Analysis](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/Screenshot%20(106).png)
 
+![Analysis2](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/Screenshot%20(108).png)
 ## Data Preparation
 The project involves data cleaning and text preprocessing to prepare tweets for NLP modeling. Data cleaning removes noise such as punctuation, numbers, URLs, and special characters, while stop words like "the" or "and" are removed to focus on meaningful words. Lemmatization is applied to reduce words to their base forms, helping the model recognize patterns across variations. These preprocessing steps ensure the text is clean, consistent, and ready for the sentiment analysis model.
 ## Modelling
@@ -26,3 +28,4 @@ To make the workflow smoother, I’m using pipelines that handle vectorization a
 I tested Logistic Regression, Random Forest, XGBoost, and SVM using both TF-IDF and Count Vectorizers. Logistic Regression and the tree-based models often struggled with less frequent sentiment classes, while SVM showed more balanced performance across all classes. Using TF-IDF, SVM achieved 68% validation and 67% test accuracy, handling class imbalance effectively. Overall, SVM was the most reliable model for predicting tweet sentiments in this project.
 
 Confusion Matrix:
+![Analysis](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/Screenshot%20(109).png)
