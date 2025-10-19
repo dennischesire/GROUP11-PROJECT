@@ -129,7 +129,7 @@ We deployed the SMOTE Logistic Regression model on Streamlit, creating an easy-t
 
 Below is the link to the deployed model on Streamlit:
 
-[Apple Sentiment Analyzer](https://dennischesire-group11-project-app-rjjfiy.streamlit.app/)
+[Apple Sentiment Analyzer](https://dennischesire-group11-project-app-rjjfi.streamlit.app/)
  <p align = 'center'> User Interface </p>
 
  ![Analysis](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(121).png)
