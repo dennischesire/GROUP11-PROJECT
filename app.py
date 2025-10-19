@@ -8,6 +8,21 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+import os
+
+@st.cache_data
+def setup_nltk():
+    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
+    if nltk_data_path not in nltk.data.path:
+        nltk.data.path.append(nltk_data_path)
+    for resource in ['punkt', 'stopwords', 'wordnet']:
+        try:
+            nltk.data.find(f'tokenizers/{resource}' if resource == 'punkt' else f'corpora/{resource}')
+        except LookupError:
+            nltk.download(resource, download_dir=nltk_data_path)
+
+setup_nltk()
+
 
 # Download NLTK data (you might need to run this once)
 # nltk.download('stopwords')
