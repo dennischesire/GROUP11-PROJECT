@@ -1,0 +1,9 @@
+streamlit==1.39.0
+joblib
+pandas
+numpy
+nltk
+regex
+scikit-learn
+torch
+transformers
