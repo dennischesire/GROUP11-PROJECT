@@ -1,61 +1,57 @@
+# ✅ Imports
 import streamlit as st
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import nltk
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-import os
 
-# ✅ MUST BE FIRST Streamlit command
+# ✅ Must be first Streamlit command
 st.set_page_config(page_title="Apple Sentiment Analyzer", page_icon="🍎", layout="wide")
 
-# ✅ Robust NLTK setup
+# ✅ NLTK setup for Streamlit Cloud
 @st.cache_data
 def setup_nltk():
     nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
     if nltk_data_path not in nltk.data.path:
         nltk.data.path.append(nltk_data_path)
     for resource in ['punkt', 'stopwords', 'wordnet']:
-        try:
-            nltk.data.find(f'tokenizers/{resource}' if resource == 'punkt' else f'corpora/{resource}')
-        except LookupError:
-            nltk.download(resource, download_dir=nltk_data_path)
+        nltk.download(resource, download_dir=nltk_data_path)
 
 setup_nltk()
 
 # ✅ Load model and vectorizer
 @st.cache_resource
 def load_model():
-    model = joblib.load('sentiment_model.pkl')
-    vectorizer = joblib.load('tfidf_vectorizer.pkl')
+    model = joblib.load("sentiment_model.pkl")
+    vectorizer = joblib.load("tfidf_vectorizer.pkl")
     return model, vectorizer
 
 # ✅ Text preprocessing
 def preprocess_text(text):
     text = text.lower()
-    text = re.sub(r'http\S+', '', text)
-    text = re.sub(r'@\w+', '', text)
-    text = re.sub(r'#\w+', '', text)
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = re.sub(r"http\S+", "", text)
+    text = re.sub(r"@\w+", "", text)
+    text = re.sub(r"#\w+", "", text)
+    text = re.sub(r"[^a-zA-Z\s]", "", text)
     tokens = word_tokenize(text)
-    stop_words = set(stopwords.words('english'))
+    stop_words = set(stopwords.words("english"))
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(token) for token in tokens if token not in stop_words]
-    return ' '.join(tokens)
+    return " ".join(tokens)
 
 # ✅ Main app
 def main():
-    # Title and description
     st.title("🍎 Apple Product Sentiment Analyzer")
     st.markdown("""
-    This tool analyzes tweets about Apple products and classifies them as **Positive**, **Negative**, or **Neutral** sentiment.
+    Analyze tweets about Apple products and classify them as **Positive**, **Negative**, or **Neutral**.
     """)
 
-    # Load model
     try:
         model, vectorizer = load_model()
         class_labels = model.classes_
@@ -64,7 +60,6 @@ def main():
         st.error(f"Error loading model: {e}")
         return
 
-    # Layout
     col1, col2 = st.columns([2, 1])
 
     with col1:
@@ -127,10 +122,9 @@ def main():
     st.markdown("Built with Streamlit | Apple Sentiment Analysis Project")
 
 # ✅ Run app
-if __name__ == "__main__":
-    main()
+main()
 
-# ✅ Batch analysis section
+# ✅ Batch analysis
 st.subheader("Batch Analysis")
 uploaded_file = st.file_uploader("Upload CSV with tweets", type=['csv'])
 if uploaded_file:
