@@ -10,6 +10,8 @@ We developed an automated sentiment classifier to help Apple’s product team mo
 
 **Modeling & Evaluation**: Logistic Regression, Random Forest, and SMOTE-enhanced Logistic Regression were tested. SMOTE Logistic Regression achieved the best balance of recall and precision. On the test set, the model reached 61.7% accuracy with 50% negative tweet recall, detecting 5.5× more complaints than previous approaches while maintaining balanced performance across classes.
 
+**Deployment**: Our analysis has been successfully deployed as a production-ready web application, enabling product teams to leverage our sentiment classification model in their daily workflow. This addition transforms the notebook from static analysis to a dynamic, implemented solution that delivers immediate business value
+
 Impact: The system automates complaint detection, enables faster response to negative feedback, and delivers actionable insights for product strategy.
 ## Data Understanding
 The dataset is from [data.world](https://data.world/crowdflower/brands-and-product-emotions). It's on Twitter Sentiment Analysis (Apple vs. Google). Human raters collected the data by manually labelling the sentiments. A total of 9093 tweets with 3 columns.
@@ -121,3 +123,13 @@ We developed and validated a production-ready sentiment analysis system that aut
 - Set up real-time Twitter API integration
 - Create basic alerting system for product team
 - Establish model performance monitoring
+
+## Deployment
+We deployed the SMOTE Logistic Regression model on Streamlit, creating an easy-to-use tool for individuals to analyze customer tweets in real time. It helps them quickly detect complaints, understand customer sentiment, and respond to issues more efficiently.
+
+Below is the link to the deployed model on Streamlit:
+
+[Apple Sentiment Analyzer](https://dennischesire-group11-project-app-rjjfiy.streamlit.app/)
+ <p align = 'center'> User Interface </p>
+
+ ![Analysis](https://github.com/dennischesire/GROUP11-PROJECT/blob/ivy/images/Screenshot%20(121).png)
