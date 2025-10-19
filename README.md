@@ -121,3 +121,10 @@ We developed and validated a production-ready sentiment analysis system that aut
 - Set up real-time Twitter API integration
 - Create basic alerting system for product team
 - Establish model performance monitoring
+
+## Deployment
+We deployed the SMOTE Logistic Regression model on Streamlit, creating an easy-to-use tool for individuals to analyze customer tweets in real time. It helps them quickly detect complaints, understand customer sentiment, and respond to issues more efficiently.
+
+Below is the link to the deployed model on Streamlit:
+
+[Apple Sentiment Analyzer](https://dennischesire-group11-project-app-rjjfiy.streamlit.app/)
