@@ -14,7 +14,7 @@ from nltk.tokenize import word_tokenize
 # ✅ Must be first Streamlit command
 st.set_page_config(page_title="Apple Sentiment Analyzer", page_icon="🍎", layout="wide")
 
-# ✅ NLTK setup for Streamlit Cloud
+# ✅ NLTK setup (no punkt_tab!)
 @st.cache_data
 def setup_nltk():
     nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
@@ -121,7 +121,6 @@ def main():
     st.markdown("---")
     st.markdown("Built with Streamlit | Apple Sentiment Analysis Project")
 
-# ✅ Run app
 main()
 
 # ✅ Batch analysis
