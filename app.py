@@ -1,179 +1,188 @@
+# ✅ Imports
 import streamlit as st
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import nltk
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import wordpunct_tokenize  # <- does NOT require punkt/punkt_tab
 
-# Download NLTK data (you might need to run this once)
-# nltk.download('stopwords')
-# nltk.download('wordnet')
-# nltk.download('punkt')
+# ✅ Must be first Streamlit command
+st.set_page_config(page_title="Apple Sentiment Analyzer", page_icon="🍎", layout="wide")
 
-# Load your saved model and vectorizer
+# ✅ NLTK setup (no punkt / no punkt_tab)
+@st.cache_data
+def setup_nltk():
+    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
+    if nltk_data_path not in nltk.data.path:
+        nltk.data.path.append(nltk_data_path)
+
+    # Only the resources we actually need
+    resources = ["stopwords", "wordnet", "omw-1.4"]
+    for r in resources:
+        try:
+            nltk.download(r, download_dir=nltk_data_path, quiet=True)
+        except Exception:
+            # Allow offline environments to proceed if data already present
+            pass
+
+setup_nltk()
+
+# ✅ Load model and vectorizer
 @st.cache_resource
 def load_model():
-    model = joblib.load('sentiment_model.pkl')
-    vectorizer = joblib.load('tfidf_vectorizer.pkl')
+    model = joblib.load("sentiment_model.pkl")
+    vectorizer = joblib.load("tfidf_vectorizer.pkl")
     return model, vectorizer
 
-# Text preprocessing function (same as your notebook)
-def preprocess_text(text):
-    # Convert to lowercase
+# ✅ Text preprocessing (no Punkt dependency)
+def preprocess_text(text: str) -> str:
     text = text.lower()
-    
-    # Remove URLs
-    text = re.sub(r'http\S+', '', text)
-    
-    # Remove user mentions and hashtags
-    text = re.sub(r'@\w+', '', text)
-    text = re.sub(r'#\w+', '', text)
-    
-    # Remove punctuation and numbers
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    
-    # Tokenize
-    tokens = word_tokenize(text)
-    
-    # Remove stopwords and lemmatize
-    stop_words = set(stopwords.words('english'))
-    lemmatizer = WordNetLemmatizer()
-    
-    tokens = [lemmatizer.lemmatize(token) for token in tokens if token not in stop_words]
-    
-    return ' '.join(tokens)
+    # remove urls, mentions, hashtags
+    text = re.sub(r"http\S+", " ", text)
+    text = re.sub(r"@\w+", " ", text)
+    text = re.sub(r"#\w+", " ", text)
 
-# Streamlit app
+    # tokenize without Punkt; split on words/punct
+    tokens = wordpunct_tokenize(text)
+
+    # keep only alphabetic tokens and remove very short noise
+    tokens = [t for t in tokens if t.isalpha() and len(t) > 1]
+
+    # stopwords + lemmatize
+    try:
+        stop_words = set(stopwords.words("english"))
+    except LookupError:
+        stop_words = set()  # fallback if offline and missing data
+
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(t) for t in tokens if t not in stop_words]
+
+    return " ".join(tokens)
+
+# ✅ Main app
 def main():
-    st.set_page_config(page_title="Apple Sentiment Analyzer", page_icon="🍎", layout="wide")
-    
-    # Title and description
     st.title("🍎 Apple Product Sentiment Analyzer")
     st.markdown("""
-    This tool analyzes tweets about Apple products and classifies them as **Positive**, **Negative**, or **Neutral** sentiment.
+    Analyze tweets about Apple products and classify them as **Positive**, **Negative**, or **Neutral**.
     """)
-    
+
     # Load model
     try:
         model, vectorizer = load_model()
-        
-        # Get the actual class labels from your model
-        class_labels = model.classes_
-        st.sidebar.write(f"Model classes: {class_labels}")
-        
+        class_labels = getattr(model, "classes_", None)
+        if class_labels is None:
+            raise AttributeError("Model has no attribute 'classes_'.")
+        st.sidebar.write(f"Model classes: {list(class_labels)}")
     except Exception as e:
-        st.error(f"Error loading model: {e}")
-        return
-    
-    # Create two columns for layout
+        st.error(f"Error loading model/vectorizer: {e}")
+        st.stop()
+
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
-        # User input
         st.subheader("Analyze Tweet Sentiment")
         user_input = st.text_area(
             "Enter a tweet about Apple products:",
             placeholder="e.g., 'I love my new iPhone! The battery life is amazing.'",
             height=100
         )
-        
-        # Analyze button
+
         if st.button("Analyze Sentiment", type="primary"):
             if user_input.strip():
-                # Preprocess the text
                 processed_text = preprocess_text(user_input)
-                
-                # Transform using TF-IDF
-                text_vectorized = vectorizer.transform([processed_text])
-                
-                # Make prediction
-                prediction = model.predict(text_vectorized)[0]
-                probability = model.predict_proba(text_vectorized)[0]
-                
-                # Display results
+                if not processed_text:
+                    st.warning("Your input had no meaningful tokens after preprocessing.")
+                # Vectorize & predict
+                try:
+                    text_vectorized = vectorizer.transform([processed_text])
+                    prediction = model.predict(text_vectorized)[0]
+                    # Some models may lack predict_proba; handle gracefully
+                    if hasattr(model, "predict_proba"):
+                        probability = model.predict_proba(text_vectorized)[0]
+                    else:
+                        # Create a pseudo-probability: 1.0 for predicted class, 0 for others
+                        probability = np.zeros(len(class_labels), dtype=float)
+                        probability[list(class_labels).index(prediction)] = 1.0
+                except Exception as e:
+                    st.error(f"Inference error: {e}")
+                    st.stop()
+
                 st.subheader("Results")
-                
-                # Sentiment with emoji
                 sentiment_emojis = {
                     'Positive emotion': '😊 POSITIVE',
-                    'Negative emotion': '😠 NEGATIVE', 
+                    'Negative emotion': '😠 NEGATIVE',
                     'No emotion toward brand or product': '😐 NEUTRAL',
                     "I can't tell": '🤔 UNCLEAR'
                 }
-                
-                sentiment_display = sentiment_emojis.get(prediction, prediction)
-                
-                # Color coding
+                sentiment_display = sentiment_emojis.get(str(prediction), str(prediction))
+
                 if 'POSITIVE' in sentiment_display:
                     st.success(f"**Sentiment:** {sentiment_display}")
                 elif 'NEGATIVE' in sentiment_display:
                     st.error(f"**Sentiment:** {sentiment_display}")
                 else:
                     st.info(f"**Sentiment:** {sentiment_display}")
-                
-                # Confidence scores - DYNAMIC based on your model
+
                 st.subheader("Confidence Scores")
-                
-                # Create DataFrame with actual model classes
-                conf_df = pd.DataFrame({
-                    'Sentiment': class_labels,
-                    'Confidence': probability * 100
-                })
-                
-                # Display as bar chart
-                st.bar_chart(conf_df.set_index('Sentiment'))
-                
-                # Also show as a table
-                st.write("Detailed probabilities:")
-                st.dataframe(conf_df.style.format({'Confidence': '{:.1f}%'}))
-                
+                try:
+                    conf_df = pd.DataFrame({
+                        'Sentiment': list(class_labels),
+                        'Confidence': (probability * 100).astype(float)
+                    })
+                    st.bar_chart(conf_df.set_index('Sentiment'))
+                    st.write("Detailed probabilities:")
+                    st.dataframe(conf_df.style.format({'Confidence': '{:.1f}%'}))
+                except Exception:
+                    st.info("Confidence scores not available for this model.")
             else:
                 st.warning("Please enter some text to analyze.")
-    
+
     with col2:
         st.subheader("About This Tool")
         st.markdown("""
         **How it works:**
-        - Trained on 9,093 human-labeled tweets
-        - Uses machine learning to classify sentiment
-        - Focuses on Apple product discussions
-        - 50% accuracy in detecting negative feedback
-        
-        **Example tweets to try:**
-        - "My new iPad is incredible!"
-        - "iPhone battery life is terrible"
-        - "Just bought a MacBook"
+        - Trained on 9,093 human-labeled tweets  
+        - Uses machine learning to classify sentiment  
+        - Focuses on Apple product discussions  
+        - 50% accuracy in detecting negative feedback  
         """)
-        
-        # Add some statistics
         st.subheader("Model Performance")
         st.metric("Negative Recall", "50%", "5% above target")
         st.metric("Overall Accuracy", "62%")
         st.metric("Tweets Analyzed", "9,093")
 
-    # Footer
     st.markdown("---")
     st.markdown("Built with Streamlit | Apple Sentiment Analysis Project")
 
-if __name__ == "__main__":
-    main()
+main()
 
-# Add this to your app.py for batch analysis
+# ✅ Batch analysis
 st.subheader("Batch Analysis")
 uploaded_file = st.file_uploader("Upload CSV with tweets", type=['csv'])
 if uploaded_file:
-    df = pd.read_csv(uploaded_file)
+    try:
+        df = pd.read_csv(uploaded_file)
+    except Exception as e:
+        st.error(f"Could not read CSV: {e}")
+        st.stop()
+
     if 'tweet_text' in df.columns:
-        # Process multiple tweets
-        processed_texts = df['tweet_text'].apply(preprocess_text)
-        predictions = model.predict(vectorizer.transform(processed_texts))
-        df['predicted_sentiment'] = predictions
-        st.dataframe(df)
-        
-        # Download results
-        csv = df.to_csv(index=False)
-        st.download_button("Download Results", csv, "sentiment_results.csv")
+        try:
+            model, vectorizer = load_model()
+            processed_texts = df['tweet_text'].astype(str).apply(preprocess_text)
+            preds = model.predict(vectorizer.transform(processed_texts))
+            df['predicted_sentiment'] = preds
+
+            st.dataframe(df)
+
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button("Download Results", csv, "sentiment_results.csv")
+        except Exception as e:
+            st.error(f"Batch inference error: {e}")
+    else:
+        st.error("CSV must contain a 'tweet_text' column.")
